@@ -99,7 +99,7 @@ function chat_type(chat_id)
 end
 function contact_list(extra, result)
   local count = result.total_count_
-  local text = "Ù„ÛŒØ³Øª Ù…Ø®Ø§Ø·Ø¨ÛŒÙ† :\n"
+  local text = "áíÓÊ ãÎÇØÈíä :\n"
   for i = 1, count do
     local user = result.users_[i]
     local firstname = user.first_name_ or ""
@@ -118,7 +118,7 @@ function process(msg)
     }
     if msg.text:match("^[!/#]pm") and is_sudo(msg) and #matches == 3 then
       tdcli.sendMessage(tonumber(matches[2]), 0, 1, matches[3], 1, "md")
-      return "_Ù¾ÛŒØ§Ù… Ø´Ù…Ø§ Ø§Ø±Ø³Ø§Ù„ Ø´Ø¯_"
+      return "_íÇã ÔãÇ ÇÑÓÇá ÔÏ_"
     end
   end
   do
@@ -128,7 +128,7 @@ function process(msg)
     if msg.text:match("^[!/#]setanswer") and is_sudo(msg) and #matches == 3 then
       redis:hset("tabchi:" .. tabchi_id .. ":answers", matches[2], matches[3])
       redis:sadd("tabchi:" .. tabchi_id .. ":answerslist", matches[2])
-      return "_Ù¾Ø§Ø³Ø® Ø¨Ø±Ø§ÛŒ_ " .. matches[2] .. " >> " .. matches[3]
+      return "_ÇÓÎ ÈÑÇí_ " .. matches[2] .. " >> " .. matches[3]
     end
   end
   do
@@ -138,11 +138,11 @@ function process(msg)
     if msg.text:match("^[!/#]delanswer") and is_sudo(msg) and #matches == 2 then
       redis:hdel("tabchi:" .. tabchi_id .. ":answers", matches[2])
       redis:srem("tabchi:" .. tabchi_id .. ":answerslist", matches[2])
-      return "_Ù¾Ø§Ø³Ø® Ø¨Ø±Ø§ÛŒ_ " .. matches[2] .. " _Ø­Ø°Ù Ø´Ø¯_"
+      return "_ÇÓÎ ÈÑÇí_ " .. matches[2] .. " _ÍĞİ ÔÏ_"
     end
   end
   if msg.text:match("^[!/#]answers$") and is_sudo(msg) then
-    local text = "_Ù„ÛŒØ³Øª Ù¾Ø§Ø³Ø® Ù‡Ø§ÛŒ Ø®ÙˆØ¯Ú©Ø§Ø±_ :\n"
+    local text = "_áíÓÊ ÇÓÎ åÇí ÎæÏ˜ÇÑ_ :\n"
     local answrs = redis:smembers("tabchi:" .. tabchi_id .. ":answerslist")
     for i = 1, #answrs do
       text = text .. i .. ". " .. answrs[i] .. " : " .. redis:hget("tabchi:" .. tabchi_id .. ":answers", answrs[i]) .. "\n"
@@ -170,7 +170,7 @@ function process(msg)
     return
   end
   if msg.text:match("^[!/#]exportlinks$") and is_sudo(msg) then
-    local text = "Ù„ÛŒÙ†Ú© Ú¯Ø±ÙˆÙ‡Ø§ :\n"
+    local text = "áíä˜ ÑæåÇ :\n"
     local links = redis:smembers("tabchi:" .. tabchi_id .. ":savedlinks")
     for i = 1, #links do
       text = text .. links[i] .. "\n"
@@ -185,48 +185,48 @@ function process(msg)
     }
     if msg.text:match("^[!/#]block") and is_sudo(msg) and #matches == 2 then
       tdcli.blockUser(tonumber(matches[2]))
-      return "Ú©Ø§Ø±Ø¨Ø± Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø¨Ù„Ø§Ú© Ø´Ø¯  ğŸ˜€"
+      return "˜ÇÑÈÑ ÈÇ ãæİŞíÊ ÈáÇ˜ ÔÏ  ??"
     end
   end
   if msg.text:match("^[!/#]help$") and is_sudo(msg) then
     local text = [[
-#Ø±Ø§Ù‡Ù†Ù…Ø§
+#ÑÇåäãÇ
 */block (id)*
-_Ø¨Ù„Ø§Ú© Ú©Ø±Ø¯Ù† Ø§Ø² Ø®ØµÙˆØµÙŠ Ø±Ø¨Ø§Øª_
+_ÈáÇ˜ ˜ÑÏä ÇÒ ÎÕæÕí ÑÈÇÊ_
 */unblock (id)*
-_Ø¢Ù† Ø¨Ù„Ø§Ú© Ú©Ø±Ø¯Ù† Ø§Ø² Ø®ØµÙˆØµÙŠ Ø±Ø¨Ø§Øª_
+_Âä ÈáÇ˜ ˜ÑÏä ÇÒ ÎÕæÕí ÑÈÇÊ_
 */panel*
-_Ù¾Ù†Ù„ Ù…Ø¯ÙŠØ±ÙŠØª Ø±Ø¨Ø§Øª_
+_äá ãÏíÑíÊ ÑÈÇÊ_
 */addsudo (id)*
-_Ø§Ø¶Ø§ÙÙ‡ Ú©Ø±Ø¯Ù† Ø¨Ù‡ Ø³ÙˆØ¯ÙˆÙ‡Ø§ÙŠ  Ø±Ø¨Ø§Øª_
+_ÇÖÇİå ˜ÑÏä Èå ÓæÏæåÇí  ÑÈÇÊ_
 */remsudo (id)*
-_Ø­Ø°Ù Ø§Ø² Ù„ÙŠØ³Øª Ø³ÙˆØ¯ÙˆÙ‡Ø§ÙŠ Ø±Ø¨Ø§Øª_
+_ÍĞİ ÇÒ áíÓÊ ÓæÏæåÇí ÑÈÇÊ_
 */bc (text)*
-_Ø§Ø±Ø³Ø§Ù„ Ù¾ÙŠØ§Ù… Ø¨Ù‡ Ù‡Ù…Ù‡_
+_ÇÑÓÇá íÇã Èå åãå_
 */fwd {all/gps/sgps/users}* (by reply)
-_ÙÙˆØ±ÙˆØ§Ø±Ø¯ Ù¾ÙŠØ§Ù… Ø¨Ù‡ Ù‡Ù…Ù‡/Ú¯Ø±ÙˆÙ‡ Ù‡Ø§/Ø³ÙˆÙ¾Ø± Ú¯Ø±ÙˆÙ‡ Ù‡Ø§/Ú©Ø§Ø±Ø¨Ø±Ø§Ù†_
+_İæÑæÇÑÏ íÇã Èå åãå/Ñæå åÇ/ÓæÑ Ñæå åÇ/˜ÇÑÈÑÇä_
 */echo (text)*
-_ØªÚ©Ø±Ø§Ø± Ù…ØªÙ†_
+_Ê˜ÑÇÑ ãÊä_
 */addedmsg (on/off)*
-_ØªØ¹ÛŒÛŒÙ† Ø±ÙˆØ´Ù† ÛŒØ§ Ø®Ø§Ù…ÙˆØ´ Ø¨ÙˆØ¯Ù† Ù¾Ø§Ø³Ø® Ø¨Ø±Ø§ÛŒ Ø´Ø± Ø´Ù† Ù…Ø®Ø§Ø·Ø¨_
+_ÊÚííä ÑæÔä íÇ ÎÇãæÔ ÈæÏä ÇÓÎ ÈÑÇí ÔÑ Ôä ãÎÇØÈ_
 */setaddedmsg (text)*
-_ØªØ¹ÙŠÙŠÙ† Ù…ØªÙ† Ø§Ø¯ Ø´Ø¯Ù† Ù…Ø®Ø§Ø·Ø¨_
+_ÊÚííä ãÊä ÇÏ ÔÏä ãÎÇØÈ_
 */markread (on/off)*
-_Ø±ÙˆØ´Ù† ÙŠØ§ Ø®Ø§Ù…ÙˆØ´ Ú©Ø±Ø¯Ù† Ø¨Ø§Ø²Ø¯ÙŠØ¯ Ù¾ÙŠØ§Ù… Ù‡Ø§_
+_ÑæÔä íÇ ÎÇãæÔ ˜ÑÏä ÈÇÒÏíÏ íÇã åÇ_
 */setanswer 'answer' text*
-_ ØªÙ†Ø¸ÙŠÙ… Ø¨Ù‡ Ø¹Ù†ÙˆØ§Ù† Ø¬ÙˆØ§Ø¨ Ø§ØªÙˆÙ…Ø§ØªÙŠÚ©_
+_ ÊäÙíã Èå ÚäæÇä ÌæÇÈ ÇÊæãÇÊí˜_
 */delanswer (answer)*
-_Ø­Ø°Ù Ø¬ÙˆØ§Ø¨ Ù…Ø±Ø¨ÙˆØ· Ø¨Ù‡_
+_ÍĞİ ÌæÇÈ ãÑÈæØ Èå_
 */answers*
-_Ù„ÙŠØ³Øª Ø¬ÙˆØ§Ø¨ Ù‡Ø§ÙŠ Ø§ØªÙˆÙ…Ø§ØªÙŠÚ©_
+_áíÓÊ ÌæÇÈ åÇí ÇÊæãÇÊí˜_
 */addtoall*
-_Ø§Ø¶Ø§ÙÙ‡ Ú©Ø±Ø¯Ù† Ù…Ø®Ø§Ø·Ø¨ÙŠÙ† Ø±Ø¨Ø§Øª Ø¨Ù‡ Ú¯Ø±ÙˆÙ‡_
+_ÇÖÇİå ˜ÑÏä ãÎÇØÈíä ÑÈÇÊ Èå Ñæå_
 */addmembers*
-_Ø§Ø¶Ø§ÙÙ‡ Ú©Ø±Ø¯Ù† Ø´Ù…Ø§Ø±Ù‡ Ù‡Ø§ Ø¨Ù‡ Ù…Ø®Ø§Ø·Ø¨ÙŠÙ† Ø±Ø¨Ø§Øª_
+_ÇÖÇİå ˜ÑÏä ÔãÇÑå åÇ Èå ãÎÇØÈíä ÑÈÇÊ_
 */exportlinks*
-_Ø¯Ø±ÙŠØ§ÙØª Ù„ÙŠÙ†Ú© Ù‡Ø§ÙŠ Ø°Ø®ÙŠØ±Ù‡ Ø´Ø¯Ù‡ ØªÙˆØ³Ø· Ø±Ø¨Ø§Øª_
+_ÏÑíÇİÊ áíä˜ åÇí ĞÎíÑå ÔÏå ÊæÓØ ÑÈÇÊ_
 */contactlist*
-_Ø¯Ø±ÙŠØ§ÙØª Ù…Ø®Ø§Ø·Ø¨Ø§Ù† Ø°Ø®ÙŠØ±Ù‡ Ø´Ø¯Ù‡ ØªÙˆØ³Ø· Ø±Ø¨Ø§Øª_
+_ÏÑíÇİÊ ãÎÇØÈÇä ĞÎíÑå ÔÏå ÊæÓØ ÑÈÇÊ_
 ]]
     return text
   end
@@ -236,7 +236,7 @@ _Ø¯Ø±ÙŠØ§ÙØª Ù…Ø®Ø§Ø·Ø¨Ø§Ù† Ø°Ø®ÙŠØ±Ù‡ Ø´Ø¯Ù‡ ØªÙˆØ³Ø· Ø±Ø¨Ø§Øª_
     }
     if msg.text:match("^[!/#]unblock") and is_sudo(msg) and #matches == 2 then
       tdcli.unblockUser(tonumber(matches[2]))
-      return "_Ú©Ø§Ø±Ø¨Ø± Ø§Ù†Ø¨Ù„Ø§Ú© Ø´Ø¯_"
+      return "_˜ÇÑÈÑ ÇäÈáÇ˜ ÔÏ_"
     end
   end
   if msg.text:match("^[!/#]panel$") and is_sudo(msg) then
@@ -259,15 +259,15 @@ _Ø¯Ø±ÙŠØ§ÙØª Ù…Ø®Ø§Ø·Ø¨Ø§Ù† Ø°Ø®ÙŠØ±Ù‡ Ø´Ø¯Ù‡ ØªÙˆØ³Ø· Ø±Ø¨Ø§Øª_
           }, dl_cb, nil)
         else
           local text = [[
-Ù¾Ù†Ù„ Ø¢Ù…Ø§Ø± Ø±Ø¨Ø§Øª ØªØ¨Ú†ÛŒ Ø´Ù…Ø§ ğŸ˜ :
+äá ÂãÇÑ ÑÈÇÊ ÊÈí ÔãÇ ?? :
 
-ØªØ¹Ø¯Ø§Ø¯ Pv ØªØ¨Ú†ÛŒ Ø´Ù…Ø§ ğŸ˜ : ]] .. pvs .. [[
+ÊÚÏÇÏ Pv ÊÈí ÔãÇ ?? : ]] .. pvs .. [[
           
-ØªØ¹Ø¯Ø§Ø¯ Ú¯Ø±ÙˆÙ‡ Ù‡Ø§ÛŒ Ù…Ø¹Ù…ÙˆÙ„ÛŒ Ø´Ù…Ø§ : ]] .. gps .. [[
+ÊÚÏÇÏ Ñæå åÇí ãÚãæáí ÔãÇ : ]] .. gps .. [[
           
-ØªØ¹Ø¯Ø§Ø¯ Ø³ÙˆÙ¾Ø± Ú¯Ø±ÙˆÙ‡ Ù‡Ø§ÛŒ Ø´Ù…Ø§ : ]] .. sgps .. [[
+ÊÚÏÇÏ ÓæÑ Ñæå åÇí ÔãÇ : ]] .. sgps .. [[
           
-ØªØ¹Ø¯Ø§Ø¯ Ù„ÛŒÙ†Ú© Ù‡Ø§ÛŒ Ø°Ø®ÛŒØ±Ù‡ Ø´Ø¯Ù‡ Ú¯Ø±ÙˆÙ‡ Ù‡Ø§ : ]] .. links
+ÊÚÏÇÏ áíä˜ åÇí ĞÎíÑå ÔÏå Ñæå åÇ : ]] .. links
           tdcli.sendMessage(msg.chat_id_, 0, 1, text, 1, "md")
         end
       end
@@ -292,7 +292,7 @@ _Ø¯Ø±ÙŠØ§ÙØª Ù…Ø®Ø§Ø·Ø¨Ø§Ù† Ø°Ø®ÙŠØ±Ù‡ Ø´Ø¯Ù‡ ØªÙˆØ³Ø· Ø±Ø¨Ø§Øª_
       msg.text:match("^[!/#](addsudo) (%d+)")
     }
     if msg.text:match("^[!/#]addsudo") and is_full_sudo(msg) and #matches == 2 then
-      local text = matches[2] .. " âœ… Ø§ÛŒÙ† Ø¢Ù‚Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø¨Ù‡ Ù„ÛŒØ³Øª Ø§Ø¯Ù…ÛŒÙ† Ù‡Ø§ Ø§Ø¶Ø§ÙÙ‡ Ø´Ø¯ "
+      local text = matches[2] .. " ? Çíä ÂŞÇ ÈÇ ãæİŞíÊ Èå áíÓÊ ÇÏãíä åÇ ÇÖÇİå ÔÏ "
       redis:sadd("tabchi:" .. tabchi_id .. ":sudoers", tonumber(matches[2]))
       return text
     end
@@ -302,7 +302,7 @@ _Ø¯Ø±ÙŠØ§ÙØª Ù…Ø®Ø§Ø·Ø¨Ø§Ù† Ø°Ø®ÙŠØ±Ù‡ Ø´Ø¯Ù‡ ØªÙˆØ³Ø· Ø±Ø¨Ø§Øª_
       msg.text:match("^[!/#](remsudo) (%d+)")
     }
     if msg.text:match("^[!/#]remsudo") and is_full_sudo(msg) and #matches == 2 then
-      local text = matches[2] .. " Ø§ÛŒÙ† Ø¢Ù‚Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø§Ø² Ù„ÛŒØ³Øª Ø§Ø¯Ù…ÛŒÙ† Ù‡Ø§ÛŒ ØªØ¨Ú†ÛŒ Ø­Ø°Ù Ø´Ø¯ ğŸ‘ŒğŸ»"
+      local text = matches[2] .. " Çíä ÂŞÇ ÈÇ ãæİŞíÊ ÇÒ áíÓÊ ÇÏãíä åÇí ÊÈí ÍĞİ ÔÏ ????"
       redis:srem("tabchi:" .. tabchi_id .. ":sudoers", tonumber(matches[2]))
       return text
     end
@@ -314,10 +314,10 @@ _Ø¯Ø±ÙŠØ§ÙØª Ù…Ø®Ø§Ø·Ø¨Ø§Ù† Ø°Ø®ÙŠØ±Ù‡ Ø´Ø¯Ù‡ ØªÙˆØ³Ø· Ø±Ø¨Ø§Øª_
     if msg.text:match("^[!/#]addedmsg") and is_sudo(msg) and #matches == 2 then
       if matches[2] == "on" then
         redis:set("tabchi:" .. tabchi_id .. ":addedmsg", true)
-        return "Ù¾ÛŒØ§Ù… Ø§Ø¯Ø¯ Ø´Ø¯Ù† Ù…Ø®Ø§Ø·Ø¨ Ù‡Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª ÙØ¹Ø§Ù„ Ø´Ø¯ ğŸ‘ŒğŸ»"
+        return "íÇã ÇÏÏ ÔÏä ãÎÇØÈ åÇ ÈÇ ãæİŞíÊ İÚÇá ÔÏ ????"
       elseif matches[2] == "off" then
         redis:del("tabchi:" .. tabchi_id .. ":addedmsg")
-        return "Ù¾ÛŒØ§Ù… Ø§Ø¯Ø¯ Ø´Ø¯Ù†Ù…Ø®Ø§Ø·Ø¨ Ù‡Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª ØºÛŒØ±ÙØ¹Ø§Ù„ Ø´Ø¯ ğŸ‘ŒğŸ»"
+        return "íÇã ÇÏÏ ÔÏäãÎÇØÈ åÇ ÈÇ ãæİŞíÊ ÛíÑİÚÇá ÔÏ ????"
       end
     end
   end
@@ -328,10 +328,10 @@ _Ø¯Ø±ÙŠØ§ÙØª Ù…Ø®Ø§Ø·Ø¨Ø§Ù† Ø°Ø®ÙŠØ±Ù‡ Ø´Ø¯Ù‡ ØªÙˆØ³Ø· Ø±Ø¨Ø§Øª_
     if msg.text:match("^[!/#]markread") and is_sudo(msg) and #matches == 2 then
       if matches[2] == "on" then
         redis:set("tabchi:" .. tabchi_id .. ":markread", true)
-        return "Ø®ÙˆØ§Ù†Ø¯Ù† Ù¾ÛŒØ§Ù… Ù‡Ø§ ØªÙˆØ³Ø· ØªØ¨Ú†ÛŒ Ø¨Ø§Ù…ÙˆÙÙ‚ÛŒØª ÙØ¹Ø§Ù„ Ø´Ø¯ ğŸ‘ŒğŸ»"
+        return "ÎæÇäÏä íÇã åÇ ÊæÓØ ÊÈí ÈÇãæİŞíÊ İÚÇá ÔÏ ????"
       elseif matches[2] == "off" then
         redis:del("tabchi:" .. tabchi_id .. ":markread")
-        return "Ø®ÙˆØ§Ù†Ø¯Ù† Ù¾ÛŒØ§Ù… Ù‡Ø§ ØªÙˆØ³Ø· ØªØ¨Ú†ÛŒ Ø´Ù…Ø§ Ø¨Ø§Ù…ÙˆÙÙ‚ÛŒØª ØºÛŒØ±ÙØ¹Ø§Ù„ Ø´Ø¯ ğŸ‘ŒğŸ»"
+        return "ÎæÇäÏä íÇã åÇ ÊæÓØ ÊÈí ÔãÇ ÈÇãæİŞíÊ ÛíÑİÚÇá ÔÏ ????"
       end
     end
   end
@@ -342,8 +342,8 @@ _Ø¯Ø±ÙŠØ§ÙØª Ù…Ø®Ø§Ø·Ø¨Ø§Ù† Ø°Ø®ÙŠØ±Ù‡ Ø´Ø¯Ù‡ ØªÙˆØ³Ø· Ø±Ø¨Ø§Øª_
     if msg.text:match("^[!/#]setaddedmsg") and is_sudo(msg) and #matches == 2 then
       redis:set("tabchi:" .. tabchi_id .. ":addedmsgtext", matches[2])
       return [[
-Ù¾ÛŒØ§Ù… Ø§Ø¯ Ø´Ø¯Ù† Ù…Ø®Ø§Ø·Ø¨ Ø¨Ø§Ù…ÙˆÙÙ‚ÛŒØª Ø°Ø®ÛŒØ±Ù‡ Ø´Ø¯....
-_Ù¾ÛŒØ§Ù…_ :
+íÇã ÇÏ ÔÏä ãÎÇØÈ ÈÇãæİŞíÊ ĞÎíÑå ÔÏ....
+_íÇã_ :
 ]] .. matches[2]
     end
   end
@@ -399,7 +399,7 @@ _Ù¾ÛŒØ§Ù…_ :
         from_background_ = 1
       }, dl_cb, nil)
     end
-    return "Ù¾ÛŒØ§Ù… Ø´Ù…Ø§ Ø¨Ø§Ù…ÙˆÙÙ‚ÛŒØª Ø§Ø±Ø³Ø§Ù„ Ø´Ø¯ â¤ï¸"
+    return "íÇã ÔãÇ ÈÇãæİŞíÊ ÇÑÓÇá ÔÏ ??"
   end
   if msg.text:match("^[!/#]fwd gps$") and msg.reply_to_message_id_ and is_sudo(msg) then
     local all = redis:smembers("tabchi:" .. tabchi_id .. ":groups")
@@ -416,7 +416,7 @@ _Ù¾ÛŒØ§Ù…_ :
         from_background_ = 1
       }, dl_cb, nil)
     end
-    return "Ù¾ÛŒØ§Ù… Ø´Ù…Ø§ Ø¨Ù‡ Ù‡Ù…Ù‡ Ú¯Ø±ÙˆÙ‡ Ù‡Ø§ Ø§Ø±Ø³Ø§Ù„ Ø´Ø¯ â¤ï¸"
+    return "íÇã ÔãÇ Èå åãå Ñæå åÇ ÇÑÓÇá ÔÏ ??"
   end
   if msg.text:match("^[!/#]fwd sgps$") and msg.reply_to_message_id_ and is_sudo(msg) then
     local all = redis:smembers("tabchi:" .. tabchi_id .. ":channels")
@@ -433,7 +433,7 @@ _Ù¾ÛŒØ§Ù…_ :
         from_background_ = 1
       }, dl_cb, nil)
     end
-    return "Ù¾ÛŒØ§Ù… Ø´Ù…Ø§ Ø¨Ù‡ Ù‡Ù…Ù‡ Ø³ÙˆÙ¾Ø± Ú¯Ø±ÙˆÙ‡ Ù‡Ø§ Ø§Ø±Ø³Ø§Ù„ Ø´Ø¯ â¤ï¸"
+    return "íÇã ÔãÇ Èå åãå ÓæÑ Ñæå åÇ ÇÑÓÇá ÔÏ ??"
   end
   if msg.text:match("^[!/#]addtoall") and msg.reply_to_message_id_ and is_sudo(msg) then
     tdcli_function({
@@ -458,7 +458,7 @@ _Ù¾ÛŒØ§Ù…_ :
         from_background_ = 1
       }, dl_cb, nil)
     end
-    return "Ù¾ÛŒØ§Ù… Ø´Ù…Ø§ Ø¨Ù‡ Ù‡Ù…Ù‡ Ú©Ø§Ø±Ø¨Ø±Ø§Ù† Ø§Ø±Ø³Ø§Ù„ Ø´Ø¯ â¤ï¸"
+    return "íÇã ÔãÇ Èå åãå ˜ÇÑÈÑÇä ÇÑÓÇá ÔÏ ??"
   end
   do
     local matches = {
